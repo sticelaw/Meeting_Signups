@@ -377,24 +377,44 @@ function generateSlots(startStr, endStr) {
 const SCHEDULE = DAYS.map(d=>({...d, slots:generateSlots(d.start,d.end)}));
 const MAX_ROWS  = Math.max(...SCHEDULE.map(d=>d.slots.length));
 
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5Pd0vXg5RtsictYAXH33DHJTAshrBQLgsn5HWofRq2w7Pd3VY9zKA7AbPUIrlhCq2ZQ/exec";
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
 // responses: { email: { name, slots: Set<key> } }
 let responses = {};
 let pendingSlots = new Set();
 
-function loadState() {
+async function loadState() {
   try {
-    const raw = localStorage.getItem("USC_AIT_poll_v3");
-    if (!raw) return;
-    for (const [email,data] of Object.entries(JSON.parse(raw)))
-      responses[email] = { name: data.name, slots: new Set(data.slots) };
-  } catch(e) { responses={}; }
+    setStatus("Loading responses…", "");
+    const res = await fetch(`${SCRIPT_URL}?action=get`);
+    const data = await res.json();
+    responses = {};
+    if (data.status === "ok") {
+      for (const r of data.responses) {
+        responses[r.email.toLowerCase()] = {
+          name: r.name,
+          slots: new Set(r.slots ? r.slots.split(",").filter(Boolean) : [])
+        };
+      }
+    }
+    setStatus(`${Object.keys(responses).length} response(s) loaded`, "ok");
+  } catch(e) {
+    setStatus("Could not load responses — check connection", "warn");
+  }
 }
-function saveState() {
-  const out={};
-  for(const [email,data] of Object.entries(responses))
-    out[email]={name:data.name, slots:[...data.slots]};
-  localStorage.setItem("USC_AIT_poll_v3", JSON.stringify(out));
+
+async function saveState(email, name, slots) {
+  const params = new URLSearchParams({
+    action: "submit",
+    email,
+    name,
+    slots: [...slots].join(",")
+  });
+  const res = await fetch(`${SCRIPT_URL}?${params.toString()}`);
+  const data = await res.json();
+  if (data.status !== "ok") throw new Error("Save failed");
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -483,25 +503,46 @@ function toggleSlot(td, key) {
 }
 
 // ── SUBMIT ────────────────────────────────────────────────────────────────────
-function submitAvailability() {
+async function submitAvailability() {
   const email=$email(), name=$name();
   if(!email||!validEmail(email)){ showToast("Please enter a valid email address."); return; }
   if(!name){ showToast("Please enter your full name."); return; }
   const isUpdate=!!responses[email];
-  responses[email]={name, slots:new Set(pendingSlots)};
-  saveState(); refreshGrid(); refreshSummary();
-  const verb=isUpdate?"Updated":"Saved";
-  showToast(`✓ ${verb}: ${name} · ${pendingSlots.size} slot${pendingSlots.size!==1?"s":""}`);
-  setStatus(`${verb} availability for ${name} <${email}>`, "ok");
-  setLookup(`✓ Response ${isUpdate?"updated":"saved"} successfully`, false);
+  const btn=document.querySelector(".btn-submit");
+  btn.disabled=true; btn.textContent="Saving…";
+  try {
+    await saveState(email, name, pendingSlots);
+    responses[email]={name, slots:new Set(pendingSlots)};
+    refreshGrid(); refreshSummary();
+    const verb=isUpdate?"Updated":"Saved";
+    showToast(`✓ ${verb}: ${name} · ${pendingSlots.size} slot${pendingSlots.size!==1?"s":""}`);
+    setStatus(`${verb} availability for ${name} <${email}>`, "ok");
+    setLookup(`✓ Response ${isUpdate?"updated":"saved"} successfully`, false);
+  } catch(e) {
+    showToast("❌ Could not save — please try again.");
+    setStatus("Save failed", "warn");
+  } finally {
+    btn.disabled=false; btn.textContent="Submit Availability";
+  }
 }
 
 // ── CLEAR ─────────────────────────────────────────────────────────────────────
-function clearMySelections() {
+async function clearMySelections() {
   const email=$email();
   pendingSlots.clear();
-  if(email&&responses[email]){ delete responses[email]; saveState(); showToast("Response removed."); setLookup("Response removed.", true); }
-  else { showToast("Selections cleared."); setLookup("",false); }
+  if(email&&responses[email]){
+    try {
+      await saveState(email, responses[email].name, new Set());
+      delete responses[email];
+      showToast("Response removed.");
+      setLookup("Response removed.", true);
+    } catch(e) {
+      showToast("❌ Could not remove — please try again.");
+    }
+  } else {
+    showToast("Selections cleared.");
+    setLookup("",false);
+  }
   refreshGrid(); refreshSummary(); setStatus("Cleared","");
 }
 
@@ -577,7 +618,12 @@ document.getElementById("emailInput").addEventListener("blur", ()=>{
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-loadState(); buildTable(); refreshGrid(); refreshSummary();
+(async () => {
+  buildTable();
+  await loadState();
+  refreshGrid();
+  refreshSummary();
+})();
 </script>
 </body>
 </html>
