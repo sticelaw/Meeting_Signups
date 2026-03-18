@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI &amp; Technology Committee — Meeting Availability Poll</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --usc-cardinal: #990000;
+    --usc-gold:     #FFCC00;
+    --usc-dark:     #6d1919;
+    --ink:          #1c1c1c;
+    --paper:        #fafaf8;
+    --cream:        #f2f0ea;
+    --border:       #d8d2c8;
+    --muted:        #888;
+    --green:        #2d6a4f;
+    --green-light:  #d8ede3;
+    --slot-h:       62px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ── HEADER ── */
+  .header-gold-bar { height: 6px; background: var(--usc-gold); }
+  header {
+    background: var(--usc-cardinal);
+    color: #fff;
+  }
+  .header-inner {
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 26px 32px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+  }
+  .header-text { flex: 1; }
+  .header-school {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    color: var(--usc-gold);
+    margin-bottom: 7px;
+  }
+  header h1 {
+    font-family: 'EB Garamond', serif;
+    font-size: clamp(20px, 3.2vw, 32px);
+    font-weight: 700;
+    line-height: 1.18;
+    margin-bottom: 6px;
+  }
+  header h1 em { font-style: italic; color: var(--usc-gold); }
+  header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.62);
+    font-weight: 300;
+  }
+
+  /* ── INSTRUCTIONS ── */
+  .instructions {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+  }
+  .instructions p {
+    max-width: 1020px; margin: 0 auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--muted);
+  }
+  .instructions strong { color: var(--ink); }
+
+  /* ── MAIN ── */
+  main { max-width: 1020px; margin: 0 auto; padding: 34px 20px 0; }
+
+  /* ── IDENTITY CARD ── */
+  .identity-card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-top: 3px solid var(--usc-cardinal);
+    border-radius: 4px;
+    padding: 20px 24px 18px;
+    margin-bottom: 30px;
+  }
+  .identity-card h2 {
+    font-family: 'EB Garamond', serif;
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .identity-fields {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;
+  }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-group label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .field-group input {
+    height: 40px; padding: 0 12px;
+    border: 1.5px solid var(--border);
+    background: var(--paper);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px; color: var(--ink);
+    border-radius: 3px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-group input:focus { border-color: var(--usc-cardinal); }
+  .field-group input::placeholder { color: #bbb; }
+  #nameInput  { width: 220px; }
+  #emailInput { width: 270px; }
+
+  .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .btn-submit {
+    height: 40px; padding: 0 22px;
+    background: var(--usc-cardinal); color: #fff; border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-submit:hover { background: var(--usc-dark); }
+  .btn-submit:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    height: 40px; padding: 0 16px;
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .btn-secondary:hover { color: var(--ink); border-color: var(--ink); }
+
+  #lookupMsg {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--green); display: none; align-items: center; gap: 5px;
+  }
+  #lookupMsg.warn { color: var(--usc-cardinal); }
+
+  /* ── GRID ── */
+  .grid-wrapper {
+    overflow-x: auto;
+    border: 1.5px solid var(--border);
+    border-radius: 4px; background: #fff;
+  }
+  table { border-collapse: collapse; width: 100%; min-width: 580px; }
+
+  thead th {
+    padding: 14px 14px 12px; text-align: left;
+    border-bottom: 2px solid var(--ink); vertical-align: bottom; background: #fff;
+  }
+  thead th:first-child {
+    width: 138px; min-width: 138px;
+    border-right: 1.5px solid var(--border);
+  }
+  .th-date {
+    font-family: 'EB Garamond', serif; font-size: 20px; font-weight: 700;
+    display: block; line-height: 1.1;
+  }
+  .th-dow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+    display: block; margin-top: 2px;
+  }
+
+  /* time-range column */
+  .td-time {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted);
+    padding: 0 10px; height: var(--slot-h);
+    border-right: 1.5px solid var(--border); border-bottom: 1px solid var(--cream);
+    white-space: nowrap; vertical-align: middle; user-select: none; line-height: 1.6;
+  }
+  .t-start { color: var(--ink); font-size: 12px; display: block; }
+  .t-sep   { display: block; color: var(--border); font-size: 10px; line-height: 0.9; }
+  .t-end   { display: block; font-size: 11px; }
+
+  /* slot cells */
+  td.slot {
+    height: var(--slot-h); border-bottom: 1px solid var(--cream);
+    padding: 5px 7px; vertical-align: top; position: relative;
+    cursor: pointer; transition: background 0.1s;
+  }
+  td.slot:not(.no-slot):hover { background: #fef2f2; }
+  td.slot.no-slot { background: var(--cream); cursor: default; }
+  td.slot.selected-mine { background: var(--green-light); }
+  td.slot.selected-mine:hover { background: #c3e4d3; }
+
+  /* time range label inside each cell */
+  .slot-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: rgba(0,0,0,0.25); pointer-events: none;
+    white-space: nowrap; margin-bottom: 4px; display: block;
+  }
+  td.slot.selected-mine .slot-label { color: var(--green); opacity: 0.65; }
+
+  .avail-bar {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: var(--usc-cardinal); opacity: 0;
+    transition: width 0.35s, opacity 0.2s; pointer-events: none;
+  }
+
+  .cell-names {
+    display: flex; flex-wrap: wrap; gap: 3px;
+    pointer-events: none; position: relative;
+  }
+  .avatar {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    background: var(--green); color: #fff;
+    border-radius: 2px; padding: 1px 5px;
+    white-space: nowrap; overflow: hidden;
+    max-width: 90px; text-overflow: ellipsis;
+  }
+  .avatar.is-me { background: var(--usc-cardinal); }
+
+  .count-badge {
+    position: absolute; top: 4px; right: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--green); font-weight: 500; pointer-events: none;
+  }
+  .count-badge.top { color: var(--usc-cardinal); font-weight: 700; }
+
+  /* ── SUMMARY ── */
+  .summary { margin-top: 36px; }
+  .summary h2 {
+    font-family: 'EB Garamond', serif; font-size: 22px;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--border);
+  }
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .summary-table th {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted);
+    text-align: left; padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-table td {
+    padding: 8px 12px; border-bottom: 1px solid var(--cream); vertical-align: middle;
+  }
+  .summary-table tr:hover td { background: var(--cream); }
+  .rank-1 td { font-weight: 600; }
+  .rank-1 td:first-child { color: var(--usc-cardinal); }
+  .prog-wrap { background: var(--cream); border-radius: 2px; height: 7px; width: 100%; max-width: 180px; }
+  .prog-fill  { height: 7px; background: var(--usc-cardinal); border-radius: 2px; transition: width 0.4s; }
+
+  /* ── STATUS BAR ── */
+  #status-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--ink); color: #fff;
+    padding: 10px 24px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    display: flex; align-items: center; gap: 14px;
+    transform: translateY(100%); transition: transform 0.3s; z-index: 100;
+  }
+  #status-bar.visible { transform: translateY(0); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .status-dot.ok   { background: #4caf7d; }
+  .status-dot.warn { background: var(--usc-gold); }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; top: 20px; right: 24px;
+    background: var(--ink); color: #fff;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    padding: 10px 18px; border-radius: 3px;
+    transform: translateY(-60px); opacity: 0;
+    transition: all 0.25s; z-index: 200;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 640px) {
+    .header-inner { flex-direction: column; gap: 12px; padding: 20px; }
+    .identity-fields { flex-direction: column; }
+    #nameInput, #emailInput { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header-gold-bar"></div>
+<header>
+  <div class="header-inner">
+    <div class="header-text">
+      <h1>AI &amp; Technology Committee<br/><em>Meeting Availability Poll</em></h1>
+      <p class="subtitle">Please indicate all one-hour slots during which you are available to meet.</p>
+    </div>
+  </div>
+</header>
+
+<div class="instructions">
+  <p><strong>Instructions:</strong> Enter your full name and email address, then click every time slot you are available for. Click <strong>Submit Availability</strong> when done. To update your response, re-enter the same email address at any time.</p>
+</div>
+
+<main>
+
+  <div class="identity-card">
+    <h2>Your Information</h2>
+    <div class="identity-fields">
+      <div class="field-group">
+        <label for="nameInput">Full Name</label>
+        <input type="text" id="nameInput" placeholder="First Last" autocomplete="name"/>
+      </div>
+      <div class="field-group">
+        <label for="emailInput">Email Address</label>
+        <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email"/>
+      </div>
+      <div class="btn-row">
+        <button class="btn-submit" onclick="submitAvailability()">Submit Availability</button>
+        <button class="btn-secondary" onclick="clearMySelections()">Clear &amp; Remove</button>
+        <span id="lookupMsg"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-wrapper">
+    <table id="scheduleTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <h2>Availability Summary</h2>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Time Slot</th>
+          <th>Available</th>
+          <th>Coverage</th>
+          <th>Respondents</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<div id="status-bar">
+  <span class="status-dot" id="statusDot"></span>
+  <span id="statusText">Ready</span>
+</div>
+<div id="toast"></div>
+
+<script>
+// ── SCHEDULE ──────────────────────────────────────────────────────────────────
+const DAYS = [
+  { label: "March 27",  dow: "Friday", start: "10:30", end: "15:30" },
+  { label: "April 3",   dow: "Friday", start: "10:30", end: "15:30" },
+  { label: "April 10",  dow: "Friday", start: "10:00", end: "15:00" },
+];
+
+function generateSlots(startStr, endStr) {
+  const toMins = s => { const [h,m]=s.split(":").map(Number); return h*60+m; };
+  const toLabel = mins => {
+    const h=Math.floor(mins/60), m=mins%60, ap=h<12?"am":"pm";
+    const h12=h===0?12:h>12?h-12:h;
+    return `${h12}:${String(m).padStart(2,"0")} ${ap}`;
+  };
+  const slots=[], end=toMins(endStr); let cur=toMins(startStr);
+  while(cur+60<=end){ slots.push({start:toLabel(cur),end:toLabel(cur+60)}); cur+=60; }
+  return slots;
+}
+
+const SCHEDULE = DAYS.map(d=>({...d, slots:generateSlots(d.start,d.end)}));
+const MAX_ROWS  = Math.max(...SCHEDULE.map(d=>d.slots.length));
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+// responses: { email: { name, slots: Set<key> } }
+let responses = {};
+let pendingSlots = new Set();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem("USC_AIT_poll_v3");
+    if (!raw) return;
+    for (const [email,data] of Object.entries(JSON.parse(raw)))
+      responses[email] = { name: data.name, slots: new Set(data.slots) };
+  } catch(e) { responses={}; }
+}
+function saveState() {
+  const out={};
+  for(const [email,data] of Object.entries(responses))
+    out[email]={name:data.name, slots:[...data.slots]};
+  localStorage.setItem("USC_AIT_poll_v3", JSON.stringify(out));
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+const $email = () => document.getElementById("emailInput").value.trim().toLowerCase();
+const $name  = () => document.getElementById("nameInput").value.trim();
+const validEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
+let _toastT;
+function showToast(msg) {
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  clearTimeout(_toastT); _toastT=setTimeout(()=>t.classList.remove("show"),3200);
+}
+function setStatus(text, mode) {
+  document.getElementById("statusText").textContent=text;
+  document.getElementById("statusDot").className="status-dot"+(mode?` ${mode}`:"");
+  document.getElementById("status-bar").classList.add("visible");
+}
+function setLookup(text, warn) {
+  const el=document.getElementById("lookupMsg");
+  el.textContent=text; el.className=warn?"warn":"";
+  el.style.display=text?"flex":"none";
+}
+
+// ── BUILD TABLE ───────────────────────────────────────────────────────────────
+function buildTable() {
+  const head=document.getElementById("tableHead");
+  const body=document.getElementById("tableBody");
+
+  const hrow=document.createElement("tr");
+  hrow.appendChild(document.createElement("th")); // blank corner
+  SCHEDULE.forEach(day=>{
+    const th=document.createElement("th");
+    th.innerHTML=`<span class="th-date">${day.label}</span><span class="th-dow">${day.dow}</span>`;
+    hrow.appendChild(th);
+  });
+  head.appendChild(hrow);
+
+  for(let row=0; row<MAX_ROWS; row++){
+    const tr=document.createElement("tr");
+
+    // Time-range column
+    const timeTd=document.createElement("td"); timeTd.className="td-time";
+    let ref=null; SCHEDULE.forEach(d=>{ if(!ref&&d.slots[row]) ref=d.slots[row]; });
+    if(ref) timeTd.innerHTML=
+      `<span class="t-start">${ref.start}</span>`+
+      `<span class="t-sep">—</span>`+
+      `<span class="t-end">${ref.end}</span>`;
+    tr.appendChild(timeTd);
+
+    SCHEDULE.forEach((day,di)=>{
+      const td=document.createElement("td");
+      const slot=day.slots[row];
+      if(!slot){
+        td.className="slot no-slot";
+      } else {
+        const key=`${di}-${row}`;
+        td.className="slot"; td.dataset.key=key;
+        td.title=`${day.label} · ${slot.start} – ${slot.end}`;
+        td.addEventListener("click",()=>toggleSlot(td,key));
+
+        // Start–end label inside cell
+        const lbl=document.createElement("div");
+        lbl.className="slot-label";
+        lbl.textContent=`${slot.start} – ${slot.end}`;
+        td.appendChild(lbl);
+
+        const bar=document.createElement("div"); bar.className="avail-bar"; bar.id=`bar-${key}`; td.appendChild(bar);
+        const names=document.createElement("div"); names.className="cell-names"; names.id=`names-${key}`; td.appendChild(names);
+        const cnt=document.createElement("span"); cnt.className="count-badge"; cnt.id=`cnt-${key}`; td.appendChild(cnt);
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  }
+}
+
+// ── TOGGLE ────────────────────────────────────────────────────────────────────
+function toggleSlot(td, key) {
+  const email=$email();
+  if(!email){ showToast("Please enter your email address first."); document.getElementById("emailInput").focus(); return; }
+  if(!validEmail(email)){ showToast("Please enter a valid email address."); return; }
+  if(pendingSlots.has(key)){ pendingSlots.delete(key); td.classList.remove("selected-mine"); }
+  else                     { pendingSlots.add(key);    td.classList.add("selected-mine"); }
+  setStatus(`${pendingSlots.size} slot${pendingSlots.size!==1?"s":""} selected — click Submit to save`, "warn");
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+function submitAvailability() {
+  const email=$email(), name=$name();
+  if(!email||!validEmail(email)){ showToast("Please enter a valid email address."); return; }
+  if(!name){ showToast("Please enter your full name."); return; }
+  const isUpdate=!!responses[email];
+  responses[email]={name, slots:new Set(pendingSlots)};
+  saveState(); refreshGrid(); refreshSummary();
+  const verb=isUpdate?"Updated":"Saved";
+  showToast(`✓ ${verb}: ${name} · ${pendingSlots.size} slot${pendingSlots.size!==1?"s":""}`);
+  setStatus(`${verb} availability for ${name} <${email}>`, "ok");
+  setLookup(`✓ Response ${isUpdate?"updated":"saved"} successfully`, false);
+}
+
+// ── CLEAR ─────────────────────────────────────────────────────────────────────
+function clearMySelections() {
+  const email=$email();
+  pendingSlots.clear();
+  if(email&&responses[email]){ delete responses[email]; saveState(); showToast("Response removed."); setLookup("Response removed.", true); }
+  else { showToast("Selections cleared."); setLookup("",false); }
+  refreshGrid(); refreshSummary(); setStatus("Cleared","");
+}
+
+// ── REFRESH GRID ──────────────────────────────────────────────────────────────
+function refreshGrid() {
+  const myEmail=$email();
+  const total=Object.keys(responses).length;
+  document.querySelectorAll("td.slot:not(.no-slot)").forEach(td=>{
+    const key=td.dataset.key;
+    const who=[];
+    for(const [em,data] of Object.entries(responses))
+      if(data.slots.has(key)) who.push({name:data.name, isMe:em===myEmail});
+    const count=who.length;
+
+    const bar=document.getElementById(`bar-${key}`);
+    if(bar){ const pct=total>0?(count/total)*100:0; bar.style.width=pct+"%"; bar.style.opacity=count>0?0.08+(pct/100)*0.15:0; }
+
+    const namesEl=document.getElementById(`names-${key}`);
+    if(namesEl){ namesEl.innerHTML=""; who.forEach(w=>{ const av=document.createElement("span"); av.className="avatar"+(w.isMe?" is-me":""); av.textContent=w.name.split(" ")[0]; namesEl.appendChild(av); }); }
+
+    const cntEl=document.getElementById(`cnt-${key}`);
+    if(cntEl){ cntEl.textContent=count>0?String(count):""; cntEl.className="count-badge"+(count>0&&count===total?" top":""); }
+
+    const activeSet=(myEmail&&responses[myEmail])?responses[myEmail].slots:pendingSlots;
+    td.classList.toggle("selected-mine", activeSet.has(key));
+  });
+}
+
+// ── REFRESH SUMMARY ───────────────────────────────────────────────────────────
+function refreshSummary() {
+  const tbody=document.getElementById("summaryBody");
+  tbody.innerHTML="";
+  const total=Object.keys(responses).length;
+  if(total===0){
+    tbody.innerHTML=`<tr><td colspan="4" style="padding:16px;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12px;">No responses submitted yet.</td></tr>`;
+    return;
+  }
+  const slotData=[];
+  SCHEDULE.forEach((day,di)=>day.slots.forEach((slot,row)=>{
+    const key=`${di}-${row}`, who=[];
+    for(const[,data] of Object.entries(responses)) if(data.slots.has(key)) who.push(data.name);
+    slotData.push({day:day.label, slot, who});
+  }));
+  slotData.sort((a,b)=>b.who.length-a.who.length);
+  slotData.forEach((s,i)=>{
+    const tr=document.createElement("tr");
+    if(i===0&&s.who.length>0) tr.className="rank-1";
+    const pct=Math.round((s.who.length/total)*100);
+    tr.innerHTML=`
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${s.day} &nbsp;·&nbsp; ${s.slot.start} – ${s.slot.end}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:12px">${s.who.length} / ${total}</td>
+      <td><div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div></td>
+      <td style="color:var(--muted);font-size:12px">${s.who.join(", ")||"—"}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ── EMAIL BLUR → LOAD PRIOR RESPONSE ─────────────────────────────────────────
+document.getElementById("emailInput").addEventListener("blur", ()=>{
+  const email=$email();
+  if(!email||!validEmail(email)){ setLookup("",false); return; }
+  if(responses[email]){
+    const data=responses[email];
+    document.getElementById("nameInput").value=data.name;
+    pendingSlots=new Set(data.slots);
+    setLookup(`↩ Prior response loaded for ${data.name}`, false);
+    setStatus(`Editing response for ${data.name} <${email}>`, "warn");
+  } else {
+    setLookup("No prior response found — new respondent.", false);
+    pendingSlots.clear();
+  }
+  refreshGrid();
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadState(); buildTable(); refreshGrid(); refreshSummary();
+</script>
+</body>
+</html>
